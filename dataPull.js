@@ -4,7 +4,7 @@ const { format } = require('path');
 const { MongoClient } = require('mongodb');
 
 const uri =
-  'mongodb://adminuser:Admin123@daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017/?ssl=true&ssl_ca_certs=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false'; // MongoDB connection string
+  'mongodb://adminuser:Admin123@daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017/?ssl=true&ssl_ca_certs=home/ubuntu/dailypull/global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false'; // MongoDB connection string
 const databaseName = 'dailypull'; // Replace with your database name
 
 const auth = 'Basic c2VhbkBha2EtZXh0ZW5zaW9ucy5jb206aHN1MjkzNGpkaXU=';
