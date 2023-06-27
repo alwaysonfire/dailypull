@@ -2,44 +2,25 @@ const axios = require('axios');
 const cron = require('node-cron');
 const { format } = require('path');
 const { MongoClient } = require('mongodb');
-
+const path = require('path');
 const fs = require('fs');
 
-// Replace <YOUR_CLUSTER_ENDPOINT> with your DocumentDB cluster's endpoint URL
-const uri =
-  'mongodb://adminuser:Admin123@daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017/?ssl=true';
+const dbName = 'dailypull';
+const caPath = 'cert/global-bundle.pem';
 
-// Read the PEM file
-const ca = [fs.readFileSync('global-bundle.pem')];
-
-// Connection options
-const options = {
-  sslValidate: true,
-  sslCA: ca,
+let options = {
+  tls: true,
+  tlsCAFile: path.resolve(caPath),
+  replicaSet: 'rs0',
+  readPreference: 'secondaryPreferred',
+  retryWrites: 'false',
 };
 
-// Establish connection to the DocumentDB cluster
+const uri =
+  'mongodb://adminuser:Admin123@daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017';
+
 const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   ...options,
-});
-
-// Connect to the cluster
-client.connect(err => {
-  if (err) {
-    console.error('Error connecting to the cluster:', err);
-    return;
-  }
-
-  console.log('Connected to the cluster.');
-
-  // Access databases and collections
-  const db = client.db('mydatabase');
-  const collection = db.collection('mycollection');
-
-  // Perform operations on the collection
-  // ...
 });
 
 const databaseName = 'dailypull'; // Replace with your database name
