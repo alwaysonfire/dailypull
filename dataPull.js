@@ -9,6 +9,7 @@ const dbName = 'dailypull';
 const caPath = 'cert/global-bundle.pem';
 
 let options = {
+  dbName,
   tls: true,
   tlsCAFile: path.resolve(caPath),
   replicaSet: 'rs0',
