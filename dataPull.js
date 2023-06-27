@@ -7,11 +7,7 @@ const fs = require('fs');
 
 // Replace <YOUR_CLUSTER_ENDPOINT> with your DocumentDB cluster's endpoint URL
 const uri =
-  'mongodb+srv://daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017/?ssl=true';
-
-// Replace <YOUR_USERNAME> and <YOUR_PASSWORD> with your DocumentDB credentials
-const username = 'adminuser';
-const password = 'Admin123';
+  'mongodb://adminuser:Admin123@daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017/?ssl=true';
 
 // Read the PEM file
 const ca = [fs.readFileSync('global-bundle.pem')];
@@ -24,14 +20,26 @@ const options = {
 
 // Establish connection to the DocumentDB cluster
 const client = new MongoClient(uri, {
-  auth: {
-    user: username,
-    password: password,
-  },
-  tls: true,
-  tlsAllowInvalidHostnames: true,
-  tlsCAFile: 'global-bundle.pem',
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
   ...options,
+});
+
+// Connect to the cluster
+client.connect(err => {
+  if (err) {
+    console.error('Error connecting to the cluster:', err);
+    return;
+  }
+
+  console.log('Connected to the cluster.');
+
+  // Access databases and collections
+  const db = client.db('mydatabase');
+  const collection = db.collection('mycollection');
+
+  // Perform operations on the collection
+  // ...
 });
 
 const databaseName = 'dailypull'; // Replace with your database name
