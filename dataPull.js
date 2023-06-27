@@ -3,8 +3,37 @@ const cron = require('node-cron');
 const { format } = require('path');
 const { MongoClient } = require('mongodb');
 
+const fs = require('fs');
+
+// Replace <YOUR_CLUSTER_ENDPOINT> with your DocumentDB cluster's endpoint URL
 const uri =
-  'mongodb://adminuser:Admin123@daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017/?ssl=true&ssl_ca_certs=home/ubuntu/dailypull/global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false'; // MongoDB connection string
+  'mongodb+srv://daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017/?ssl=true';
+
+// Replace <YOUR_USERNAME> and <YOUR_PASSWORD> with your DocumentDB credentials
+const username = 'adminuser';
+const password = 'Admin123';
+
+// Read the PEM file
+const ca = [fs.readFileSync('global-bundle.pem')];
+
+// Connection options
+const options = {
+  sslValidate: true,
+  sslCA: ca,
+};
+
+// Establish connection to the DocumentDB cluster
+const client = new MongoClient(uri, {
+  auth: {
+    user: username,
+    password: password,
+  },
+  tls: true,
+  tlsAllowInvalidHostnames: true,
+  tlsCAFile: 'global-bundle.pem',
+  ...options,
+});
+
 const databaseName = 'dailypull'; // Replace with your database name
 
 const auth = 'Basic c2VhbkBha2EtZXh0ZW5zaW9ucy5jb206aHN1MjkzNGpkaXU=';
@@ -36,7 +65,6 @@ const users = [
 
 const connectToMongoDB = async (dataSource, collectionName, user) => {
   try {
-    const client = new MongoClient(uri);
     await client.connect();
     console.log('Connected to MongoDB');
 
