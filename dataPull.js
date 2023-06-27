@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 
 const dbName = 'dailypull';
-const caPath = '/home/ubuntu/dailypull/cert/global-bundle.pem';
+const caPath = '/home/ubuntu/global-bundle.pem';
 
 let options = {
   dbName,
