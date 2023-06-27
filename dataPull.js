@@ -116,6 +116,7 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               },
             };
             const insertResult = await collection.insertOne(res);
+            console.log('Inserted document:', insertResult.insertedId);
           }
         }
       }
@@ -156,6 +157,7 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
             },
           };
           const insertResult = await collection.insertOne(res);
+          console.log('Inserted document:', insertResult.insertedId);
         }
       }
     }
