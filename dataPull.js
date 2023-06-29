@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const dbName = 'dailypull';
 const caPath = '/home/ubuntu/global-bundle.pem';
-let dev = false;
+let dev = true;
 let uri = 'mongodb://localhost:27017';
 let options = {};
 if (dev) {
