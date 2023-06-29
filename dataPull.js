@@ -7,18 +7,22 @@ const fs = require('fs');
 
 const dbName = 'dailypull';
 const caPath = '/home/ubuntu/global-bundle.pem';
+let dev = false;
+let uri = 'mongodb://localhost:27017';
+let options = {};
+if (dev) {
+  options = {
+    dbName,
+    tls: true,
+    tlsCAFile: path.resolve(caPath),
+    replicaSet: 'rs0',
+    readPreference: 'secondaryPreferred',
+    retryWrites: 'false',
+  };
 
-let options = {
-  dbName,
-  tls: true,
-  tlsCAFile: path.resolve(caPath),
-  replicaSet: 'rs0',
-  readPreference: 'secondaryPreferred',
-  retryWrites: 'false',
-};
-
-const uri =
-  'mongodb://adminuser:Admin123@daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017';
+  uri =
+    'mongodb://adminuser:Admin123@daily-pull-vlm.cluster-ct3hcedret2a.eu-central-1.docdb.amazonaws.com:27017';
+}
 
 const client = new MongoClient(uri, {
   ...options,
@@ -77,8 +81,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               Authorization: auth,
             },
             params: {
-              from: formattedDate,
-              to: formattedDate,
+              from: '2023-06-28',
+              to: '2023-06-29',
               page: '',
               channel: '',
               subid: '',
@@ -189,8 +193,8 @@ const fetchData = async () => {
           apiKey: user.apiKey,
           groupBy: 'merchant',
           publisherId: user.publisherId,
-          startDate: formattedDate,
-          endDate: formattedDate,
+          startDate: '2023-04-01',
+          endDate: '2023-06-29',
         },
       });
       await connectToMongoDB(
