@@ -29,7 +29,7 @@ const client = new MongoClient(uri, {
 });
 
 const databaseName = 'dailypull'; // Replace with your database name
-
+const skEmail = 'sean@aka-extensions.com';
 const auth = 'Basic c2VhbkBha2EtZXh0ZW5zaW9ucy5jb206aHN1MjkzNGpkaXU=';
 const apiUrlSourceKnowledge =
   'https://api.sourceknowledge.com/affiliate/v2/campaigns';
@@ -102,12 +102,14 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
             const res = {
               sourceName: 'Source Knowledge',
               sourceId: '',
-              accountName: data.advertiser.name,
+              accountName: skEmail,
               accountId: '',
               createdAt: formattedDate,
               updatedAt: formattedDate,
               merchant: data.advertiser.name,
               merchantId: data.advertiser.id,
+              campaignId: data.id,
+              campaignName: data.name,
               stats: {
                 device: data.name,
                 source,
@@ -139,8 +141,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
           revenue = item.clicks * item.cpc;
           conversionRate = item.conversionRate;
           costOfSale = item.costOfSale;
-          sales = costOfSale ? revenue / costOfSale : revenue;
-          placementId = item.placementId;
+          sales = item.costOfSale ? revenue / costOfSale : 0;
+          placementId = item.placementId.toString();
           const res = {
             sourceName: 'Connexity',
             sourceId: '',
