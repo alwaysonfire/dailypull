@@ -81,8 +81,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               Authorization: auth,
             },
             params: {
-              from: '2023-04-01',
-              to: '2023-06-29',
+              from: '2023-05-01',
+              to: '2023-07-03',
               page: '',
               channel: '',
               subid: '',
