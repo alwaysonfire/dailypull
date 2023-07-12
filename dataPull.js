@@ -4,6 +4,7 @@ const { format } = require('path');
 const { MongoClient } = require('mongodb');
 const path = require('path');
 const fs = require('fs');
+const { cxnInit } = require('./service');
 
 const dbName = 'dailypull';
 const caPath = '/home/ubuntu/global-bundle.pem';
@@ -31,11 +32,9 @@ const client = new MongoClient(uri, {
 const databaseName = 'dailypull'; // Replace with your database name
 const skEmail = 'sean@aka-extensions.com';
 const auth = 'Basic c2VhbkBha2EtZXh0ZW5zaW9ucy5jb206aHN1MjkzNGpkaXU=';
-const apiUrlSourceKnowledge =
-  'https://api.sourceknowledge.com/affiliate/v2/campaigns';
+const apiUrlSourceKnowledge = 'https://api.sourceknowledge.com/affiliate/v2/campaigns';
 
-const apiUrlConnexity =
-  'https://publisher-api.connexity.com/api/reporting/quality';
+const apiUrlConnexity = 'https://publisher-api.connexity.com/api/reporting/quality';
 const currentDate = new Date();
 
 const year = currentDate.getFullYear();
@@ -81,7 +80,7 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               Authorization: auth,
             },
             params: {
-              from: '2023-05-01',
+              from: '2023-06-01',
               to: '2023-07-03',
               page: '',
               channel: '',
@@ -106,7 +105,7 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               accountId: '',
               createdAt: formattedDate,
               updatedAt: formattedDate,
-              merchant: data.advertiser.name,
+              merchantName: data.advertiser.name,
               merchantId: data.advertiser.id,
               campaignId: data.id,
               campaignName: data.name,
@@ -150,7 +149,7 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
             accountId: '',
             createdAt: formattedDate,
             updatedAt: formattedDate,
-            merchant: item.merchantName,
+            merchantName: item.merchantName,
             merchantId: item.merchantId,
             stats: {
               clicks,
@@ -189,22 +188,20 @@ const fetchData = async () => {
 
     await connectToMongoDB(response.data.items, 'stats_traffic_sources');
 
-    for (const user of users) {
-      const response = await axios.get(apiUrlConnexity, {
-        params: {
-          apiKey: user.apiKey,
-          groupBy: 'merchant',
-          publisherId: user.publisherId,
-          startDate: '2023-04-01',
-          endDate: '2023-06-29',
-        },
-      });
-      await connectToMongoDB(
-        response.data.qualityEntries,
-        'stats_media_platforms',
-        user.username
-      );
-    }
+    await cxnInit();
+
+    // for (const user of users) {
+    //   const response = await axios.get(apiUrlConnexity, {
+    //     params: {
+    //       apiKey: user.apiKey,
+    //       groupBy: 'merchant',
+    //       publisherId: user.publisherId,
+    //       startDate: '2023-04-01',
+    //       endDate: '2023-06-29',
+    //     },
+    //   });
+    //   await connectToMongoDB(response.data.qualityEntries, 'stats_media_platforms', user.username);
+    // }
   } catch (error) {
     console.error('Error:', error.message);
   }
