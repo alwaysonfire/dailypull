@@ -5,6 +5,11 @@ const { MongoClient } = require('mongodb');
 const path = require('path');
 const fs = require('fs');
 const { cxnInit } = require('./service');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+console.log('ENV = ', process.env.NODE_ENV ?? 'dev');
 
 const dbName = 'dailypull';
 const caPath = '/home/ubuntu/global-bundle.pem';
