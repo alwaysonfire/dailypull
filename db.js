@@ -16,7 +16,7 @@ let options = {};
 let connectionUrl = 'mongodb://localhost:27017/dailypull';
 
 
-if (env !== 'dev') {
+if (true) {
   options = {
     dbName,
     tls: true,
