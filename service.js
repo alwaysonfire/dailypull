@@ -78,31 +78,47 @@ exports.cxnAuthenticate = async ({ email, password }) => {
   return data;
 };
 
-exports.cxnGetReportDownloadUrl = async ({ token, publisherId }) => {
-  const requestData = {
-    publisherId: publisherId.toString(),
-    reportType: 'CUSTOM_REPORT',
-    timeRangeType: 'LAST_30_DAYS',
-    startDate: null,
-    endDate: null,
-    aggregationType: 'DAY',
-    pageNumber: 1,
-    fieldList: 'MERCHANT_NAME,PLACEMENT_ID,RID',
-  };
+exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
+  console.log('downloading connexity report');
+  return new Promise(async (resolve, reject) => {
+    const requestData = {
+      publisherId: publisherId.toString(),
+      reportType: 'CUSTOM_REPORT',
+      timeRangeType: 'LAST_30_DAYS',
+      startDate: null,
+      endDate: null,
+      aggregationType: 'DAY',
+      pageNumber: 1,
+      fieldList: 'MERCHANT_NAME,PLACEMENT_ID,RID',
+    };
 
-  const { data } = await axios.post(CXN.URLS.GENERATE_REPORT, requestData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    const { data } = await axios.post(CXN.URLS.GENERATE_REPORT, requestData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const {
+      reportResponse: { reportUrls },
+    } = data;
+
+    const [downloadUrl] = reportUrls;
+
+    const resolveFn = done ?? resolve;
+
+    if (downloadUrl) {
+      return resolveFn(downloadUrl);
+    }
+
+    if (retry > 0) {
+      console.log(`retrying to download connexity report. retries left: ${retry - 1}`);
+
+      setTimeout(
+        () => this.cxnGetReportDownloadUrl({ token, publisherId, retry: retry - 1 }, resolveFn),
+        10000
+      );
+    }
   });
-
-  const {
-    reportResponse: { reportUrls },
-  } = data;
-
-  const [downloadUrl] = reportUrls;
-
-  return downloadUrl;
 };
 
 exports.cxnGetReportJsonData = async () => {
@@ -112,6 +128,8 @@ exports.cxnGetReportJsonData = async () => {
   const { token, publisherId } = await this.cxnAuthenticate({ email, password });
 
   const data = await this.cxnGetReportDownloadUrl({ token, publisherId });
+
+  if (!data) throw new Error('no report generated from connexity');
 
   const { url: downloadUrl } = data;
 
