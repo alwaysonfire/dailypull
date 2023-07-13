@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dataPull.js"
+    "start:dev": "node dataPull.js",
+    "start": "set NODE_ENV=prod & node dataPull.js"    
   },
   "keywords": [],
   "author": "",
