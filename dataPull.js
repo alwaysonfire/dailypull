@@ -176,17 +176,17 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
 
 const fetchData = async () => {
   try {
-    const response = await axios.get(apiUrlSourceKnowledge, {
-      headers: {
-        Authorization: auth,
-      },
-      params: {
-        page: null,
-        advertiserId: null,
-      },
-    });
+    // const response = await axios.get(apiUrlSourceKnowledge, {
+    //   headers: {
+    //     Authorization: auth,
+    //   },
+    //   params: {
+    //     page: null,
+    //     advertiserId: null,
+    //   },
+    // });
 
-    await connectToMongoDB(response.data.items, 'stats_traffic_sources');
+    // await connectToMongoDB(response.data.items, 'stats_traffic_sources');
 
     await cxnInit();
 
