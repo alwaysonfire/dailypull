@@ -5,9 +5,9 @@ const { MongoClient } = require('mongodb');
 const path = require('path');
 const fs = require('fs');
 const { cxnInit } = require('./service');
-const dotenv = require('dotenv')
+const dotenv = require('dotenv');
 
-dotenv.config()
+dotenv.config();
 
 console.log(`ENV = ${process.env.NODE_ENV}`);
 
@@ -85,8 +85,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               Authorization: auth,
             },
             params: {
-              from: '2023-06-01',
-              to: '2023-07-03',
+              from: '2023-06-15',
+              to: '2023-07-15',
               page: '',
               channel: '',
               subid: '',
@@ -213,12 +213,12 @@ const fetchData = async () => {
 };
 
 // Schedule the task to run every 24 minutes
-cron.schedule('0 0 * * *', () => {
-  console.log('Running data pull...');
-  fetchData();
-});
+// cron.schedule('0 0 * * *', () => {
+//   console.log('Running data pull...');
+//   fetchData();
+// });
 
-console.log('Scheduler started.');
+// console.log('Scheduler started.');
 
 // Initial data pull
 fetchData();

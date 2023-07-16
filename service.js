@@ -61,7 +61,7 @@ exports._cxnCleanJson = ({ data }) => {
         epc: +EPC,
         revenue: +EARNINGS,
         conversionRate: +CONVERSION_RATE,
-        conversions: Math.floor(CLICKS * CONVERSION_RATE),
+        conversions: Math.round(CLICKS * CONVERSION_RATE),
         costOfSale: '',
         sales: +SALES_COUNT,
         placementId: PLACEMENT_ID,
@@ -117,6 +117,8 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
         () => this.cxnGetReportDownloadUrl({ token, publisherId, retry: retry - 1 }, resolveFn),
         10000
       );
+    } else {
+      reject('no data returned by connexity')
     }
   });
 };
