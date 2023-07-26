@@ -84,12 +84,13 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
     const requestData = {
       publisherId: publisherId.toString(),
       reportType: 'CUSTOM_REPORT',
-      timeRangeType: 'LAST_30_DAYS',
-      startDate: null,
-      endDate: null,
+      timeRangeType: null,
+      startDate: '2023-06-16',
+      endDate: '2023-07-15',
       aggregationType: 'DAY',
       pageNumber: 1,
-      fieldList: 'MERCHANT_NAME,PLACEMENT_ID,RID',
+      preview: false,
+      fieldList: 'PLACEMENT_ID,RID,MERCHANT_ID,MERCHANT_NAME',
     };
 
     const { data } = await axios.post(CXN.URLS.GENERATE_REPORT, requestData, {
@@ -118,7 +119,7 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
         10000
       );
     } else {
-      reject('no data returned by connexity')
+      reject('no data returned by connexity');
     }
   });
 };
