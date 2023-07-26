@@ -85,7 +85,7 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               Authorization: auth,
             },
             params: {
-              from: '2023-06-15',
+              from: '2023-06-16',
               to: '2023-07-15',
               page: '',
               channel: '',
@@ -191,7 +191,7 @@ const fetchData = async () => {
       },
     });
 
-    await connectToMongoDB(response.data.items, 'stats_traffic_sources');
+    await connectToMongoDB(response.data.items, 'stats_traffic_sources_new');
 
     await cxnInit();
 

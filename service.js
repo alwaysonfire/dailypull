@@ -160,7 +160,7 @@ exports.cxnInit = async () => {
   const cxnData = await this.cxnGetReportJsonData();
 
   const db = client.db('dailypull');
-  const collection = db.collection('stats_media_platforms');
+  const collection = db.collection('stats_media_platforms_new');
 
   await collection.insertMany(cxnData);
 
