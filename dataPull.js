@@ -69,7 +69,7 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
     // Get the database and collection references
     const database = client.db(databaseName);
     const collection = database.collection(collectionName);
-    if (collectionName === 'stats_traffic_sources') {
+    if (collectionName === 'stats_traffic_sources_new') {
       for (const data of dataSource) {
         let source = '';
         let winRatio = '';
