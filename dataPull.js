@@ -1,6 +1,5 @@
 const axios = require('axios');
 const cron = require('node-cron');
-const { format } = require('path');
 const { MongoClient } = require('mongodb');
 const path = require('path');
 const { cxnInit } = require('./service');
@@ -39,15 +38,6 @@ const databaseName = 'dailypull'; // Replace with your database name
 const skEmail = 'sean@aka-extensions.com';
 const auth = 'Basic c2VhbkBha2EtZXh0ZW5zaW9ucy5jb206aHN1MjkzNGpkaXU=';
 const apiUrlSourceKnowledge = 'https://api.sourceknowledge.com/affiliate/v2/campaigns';
-
-const apiUrlConnexity = 'https://publisher-api.connexity.com/api/reporting/quality';
-const currentDate = new Date();
-
-const year = currentDate.getFullYear();
-const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-const day = String(currentDate.getDate()).padStart(2, '0');
-
-const formattedDate = `${year}-${month}-${day}`;
 
 const users = [
   {
@@ -112,8 +102,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               sourceId: '',
               accountName: skEmail,
               accountId: '',
-              createdAt: formattedDate,
-              updatedAt: formattedDate,
+              createdAt: yesterday,
+              updatedAt: yesterday,
               merchantName: data.advertiser.name,
               merchantId: data.advertiser.id,
               campaignId: data.id,
@@ -156,8 +146,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
             sourceId: '',
             accountName: user,
             accountId: '',
-            createdAt: formattedDate,
-            updatedAt: formattedDate,
+            createdAt: yesterday,
+            updatedAt: yesterday,
             merchantName: item.merchantName,
             merchantId: item.merchantId,
             stats: {
@@ -194,16 +184,16 @@ const fetchData = async () => {
         advertiserId: null,
       },
     });
-
-    // await connectToMongoDB(response.data.items, 'stats_traffic_sources_new');
-
-    // await cxnInit();
+    await connectToMongoDB(response.data.items, 'stats_traffic_sources_new');
+    await cxnInit();
   } catch (error) {
     console.error('Error:', error.message);
   }
 };
 
-
 console.log('Scheduler started.');
 
-fetchData().finally(() => process.exit())
+cron.schedule('0 0 * * *', () => {
+  console.log('Running data pull...');
+  fetchData();
+});
