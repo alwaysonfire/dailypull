@@ -3,9 +3,9 @@ const cron = require('node-cron');
 const { format } = require('path');
 const { MongoClient } = require('mongodb');
 const path = require('path');
-const fs = require('fs');
 const { cxnInit } = require('./service');
 const dotenv = require('dotenv');
+const moment = require('moment');
 
 dotenv.config();
 
@@ -16,6 +16,7 @@ const caPath = '/home/ubuntu/global-bundle.pem';
 let dev = true;
 let uri = 'mongodb://localhost:27017';
 let options = {};
+
 if (dev) {
   options = {
     dbName,
@@ -69,6 +70,9 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
     // Get the database and collection references
     const database = client.db(databaseName);
     const collection = database.collection(collectionName);
+
+    const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
+
     if (collectionName === 'stats_traffic_sources_new') {
       for (const data of dataSource) {
         let source = '';
@@ -85,8 +89,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               Authorization: auth,
             },
             params: {
-              from: '2023-06-16',
-              to: '2023-07-15',
+              from: yesterday,
+              to: yesterday,
               page: '',
               channel: '',
               subid: '',
@@ -193,32 +197,15 @@ const fetchData = async () => {
 
     await connectToMongoDB(response.data.items, 'stats_traffic_sources_new');
 
-    await cxnInit();
-
-    // for (const user of users) {
-    //   const response = await axios.get(apiUrlConnexity, {
-    //     params: {
-    //       apiKey: user.apiKey,
-    //       groupBy: 'merchant',
-    //       publisherId: user.publisherId,
-    //       startDate: '2023-04-01',
-    //       endDate: '2023-06-29',
-    //     },
-    //   });
-    //   await connectToMongoDB(response.data.qualityEntries, 'stats_media_platforms', user.username);
-    // }
+    // await cxnInit();
   } catch (error) {
     console.error('Error:', error.message);
   }
 };
 
-// Schedule the task to run every 24 minutes
-// cron.schedule('0 0 * * *', () => {
-//   console.log('Running data pull...');
-//   fetchData();
-// });
+cron.schedule('*/5 * * * *', () => {
+  console.log('Running data pull...');
+  // fetchData();
+});
 
-// console.log('Scheduler started.');
-
-// Initial data pull
-fetchData();
+console.log('Scheduler started.');

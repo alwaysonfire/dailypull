@@ -2,6 +2,7 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 const Papa = require('papaparse');
 const client = require('./db');
+const moment = require('moment');
 
 dotenv.config();
 
@@ -80,13 +81,14 @@ exports.cxnAuthenticate = async ({ email, password }) => {
 
 exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
   console.log('downloading connexity report');
+
   return new Promise(async (resolve, reject) => {
     const requestData = {
       publisherId: publisherId.toString(),
       reportType: 'CUSTOM_REPORT',
-      timeRangeType: null,
-      startDate: '2023-06-16',
-      endDate: '2023-07-15',
+      timeRangeType: 'YESTERDAY',
+      startDate: null,
+      endDate: null,
       aggregationType: 'DAY',
       pageNumber: 1,
       preview: false,
