@@ -195,7 +195,7 @@ const fetchData = async () => {
       },
     });
 
-    await connectToMongoDB(response.data.items, 'stats_traffic_sources_new');
+    // await connectToMongoDB(response.data.items, 'stats_traffic_sources_new');
 
     // await cxnInit();
   } catch (error) {
@@ -203,9 +203,7 @@ const fetchData = async () => {
   }
 };
 
-cron.schedule('* * * * *', () => {
-  console.log('Running data pull...');
-  // fetchData();
-});
 
 console.log('Scheduler started.');
+
+fetchData().finally(() => process.exit())
