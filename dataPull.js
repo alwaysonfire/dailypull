@@ -203,7 +203,7 @@ const fetchData = async () => {
   }
 };
 
-cron.schedule('*/5 * * * *', () => {
+cron.schedule('* * * * *', () => {
   console.log('Running data pull...');
   // fetchData();
 });
