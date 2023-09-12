@@ -62,6 +62,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
     const collection = database.collection(collectionName);
 
     const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
+    const yesterdayObj = moment().subtract(1, 'day').toDate()
+
 
     if (collectionName === 'stats_traffic_sources_new') {
       for (const data of dataSource) {
@@ -102,8 +104,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               sourceId: '',
               accountName: skEmail,
               accountId: '',
-              createdAt: yesterday,
-              updatedAt: yesterday,
+              createdAt: yesterdayObj,
+              updatedAt: yesterdayObj,
               merchantName: data.advertiser.name,
               merchantId: data.advertiser.id,
               campaignId: data.id,
@@ -146,8 +148,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
             sourceId: '',
             accountName: user,
             accountId: '',
-            createdAt: yesterday,
-            updatedAt: yesterday,
+            createdAt: yesterdayObj,
+            updatedAt: yesterdayObj,
             merchantName: item.merchantName,
             merchantId: item.merchantId,
             stats: {
