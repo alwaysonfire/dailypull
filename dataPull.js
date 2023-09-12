@@ -64,6 +64,10 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
     const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
     const yesterdayObj = moment().subtract(1, 'day').toDate()
 
+    const startDate = moment().subtract(2, 'weeks').format('YYYY-MM-DD')
+    const endDate = moment().format('YYYY-MM-DD')
+    const todayDate = new Date()
+
 
     if (collectionName === 'stats_traffic_sources_new') {
       for (const data of dataSource) {
@@ -81,8 +85,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               Authorization: auth,
             },
             params: {
-              from: yesterday,
-              to: yesterday,
+              from: startDate,
+              to: endDate,
               page: '',
               channel: '',
               subid: '',
@@ -104,8 +108,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
               sourceId: '',
               accountName: skEmail,
               accountId: '',
-              createdAt: yesterdayObj,
-              updatedAt: yesterdayObj,
+              createdAt: todayDate,
+              updatedAt: todayDate,
               merchantName: data.advertiser.name,
               merchantId: data.advertiser.id,
               campaignId: data.id,
@@ -148,8 +152,8 @@ const connectToMongoDB = async (dataSource, collectionName, user) => {
             sourceId: '',
             accountName: user,
             accountId: '',
-            createdAt: yesterdayObj,
-            updatedAt: yesterdayObj,
+            createdAt: todayDate,
+            updatedAt: todayDate,
             merchantName: item.merchantName,
             merchantId: item.merchantId,
             stats: {
