@@ -138,7 +138,7 @@ exports.skInit = async () => {
   const campaignStats = await this._onInterval({
     interval: 3000,
     callback: this.skGetStatsByDate,
-    callbackArgs: callbackArgs.slice(0,5),
+    callbackArgs: callbackArgs,
   });
 
   const campaignStatsRow = campaignStats.flatMap(campaign => {
