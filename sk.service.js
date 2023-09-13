@@ -124,13 +124,15 @@ exports.skInit = async () => {
     return acc;
   }, {});
 
+  const from = moment().subtract(2, 'weeks').format('YYYY-MM-DD');
   const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
-  const yesterdayDate = moment().subtract(1, 'day').toDate();
+  
+  const yesterdayDate = moment().subtract(2, 'weeks').toDate();
 
   const callbackArgs = campaigns.map(item => {
     return {
       campaignId: item.id,
-      from: yesterday,
+      from: from,
       to: yesterday,
     };
   });
