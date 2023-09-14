@@ -31,7 +31,7 @@ const CXN = {
   },
 };
 
-exports._cxnCleanJson = ({ data }) => {
+exports._cxnCleanJson = ({ data, email, accountId = '' }) => {
   return data.map(item => {
     const {
       FROM_DATE,
@@ -49,8 +49,8 @@ exports._cxnCleanJson = ({ data }) => {
     const newData = {
       sourceName: 'connexity',
       sourceId: '',
-      accountName: 'sean@aka-extensions.com',
-      accountId: '',
+      accountName: email,
+      accountId,
       createdAt: moment(FROM_DATE).toDate(),
       updatedAt: moment(FROM_DATE).toDate(),
       merchantName: MERCHANT_NAME,
@@ -126,10 +126,7 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
   });
 };
 
-exports.cxnGetReportJsonData = async () => {
-  const email = process.env.CXN_EMAIL;
-  const password = process.env.CXN_PASSWORD;
-
+exports.cxnGetReportJsonData = async ({ email, password, accountId }) => {
   const { token, publisherId } = await this.cxnAuthenticate({ email, password });
 
   const data = await this.cxnGetReportDownloadUrl({ token, publisherId });
@@ -138,36 +135,43 @@ exports.cxnGetReportJsonData = async () => {
 
   const { url: downloadUrl } = data;
 
-  const json = await this.downloadCsvAsJson({ downloadUrl });
+  const json = await this.downloadCsvAsJson({ downloadUrl, email, accountId });
 
   return json;
 };
 
-exports.downloadCsvAsJson = async ({ downloadUrl, config = {} }) => {
+exports.downloadCsvAsJson = async ({ downloadUrl, config = {}, email, accountId }) => {
   const { data } = await axios.get(downloadUrl, config);
 
   const json = Papa.parse(data, { header: true });
 
   json.data = json.data.filter(item => item.MERCHANT_NAME);
 
-  const cleanedJson = this._cxnCleanJson({ data: json.data });
+  const cleanedJson = this._cxnCleanJson({ data: json.data, email, accountId });
 
   return cleanedJson;
 };
 
-exports.cxnInit = async () => {
+exports.cxnInit = async ({ users }) => {
   console.log('Pulling from connexity');
   console.time('connexity_time');
   await client.connect();
 
-  const cxnData = await this.cxnGetReportJsonData();
+  for (const user of users) {
+    console.log(`getting data from ${user.email}`);
 
-  console.log('data from cxn :>> ', cxnData.length);
+    const cxnData = await this.cxnGetReportJsonData(user);
 
-  const db = client.db('dailypull');
-  const collection = db.collection('stats_media_platforms_new');
+    console.log(`data from ${user.email} :>> `, cxnData.length);
 
-  if(cxnData.length > 0) await collection.insertMany(cxnData);
+    const db = client.db('dailypull');
+    const collection = db.collection('stats_media_platforms_new');
+
+    console.log(`saving ${cxnData.length} cxn data`);
+    if (cxnData.length > 0) {
+      await collection.insertMany(cxnData);
+    }
+  }
 
   console.timeEnd('connexity_time');
 };

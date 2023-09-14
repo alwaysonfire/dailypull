@@ -3,10 +3,16 @@ const cron = require('node-cron');
 const { cxnInit } = require('./cxn.service');
 const { skInit } = require('./sk.service');
 
+const cxnUsers = [
+  {
+    email: 'rubi@aka-extensions.com',
+    password: 'sdfLKNl34$jhndJ',
+  },
+];
 const fetchData = async () => {
   try {
     // await skInit();
-    await cxnInit();
+    await cxnInit({ users: cxnUsers });
   } catch (error) {
     console.error('Error:', error.message);
   }
