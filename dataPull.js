@@ -5,7 +5,7 @@ const { skInit } = require('./sk.service');
 
 const fetchData = async () => {
   try {
-    await skInit();
+    // await skInit();
     await cxnInit();
   } catch (error) {
     console.error('Error:', error.message);

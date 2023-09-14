@@ -86,9 +86,9 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
     const requestData = {
       publisherId: publisherId.toString(),
       reportType: 'CUSTOM_REPORT',
-      timeRangeType: 'YESTERDAY',
-      startDate: null,
-      endDate: null,
+      timeRangeType: null,
+      startDate: '2023-08-30',
+      endDate: '2023-09-13',
       aggregationType: 'DAY',
       pageNumber: 1,
       preview: false,
@@ -162,10 +162,12 @@ exports.cxnInit = async () => {
 
   const cxnData = await this.cxnGetReportJsonData();
 
+  console.log('data from cxn :>> ', cxnData.length);
+
   const db = client.db('dailypull');
   const collection = db.collection('stats_media_platforms_new');
 
-  await collection.insertMany(cxnData);
+  if(cxnData.length > 0) await collection.insertMany(cxnData);
 
   console.timeEnd('connexity_time');
 };
