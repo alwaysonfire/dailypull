@@ -149,13 +149,11 @@ exports.skInit = async () => {
 
   const campaigns = await this.skGetCampaigns();
 
-  const from = moment().subtract(1, 'week').format('YYYY-MM-DD');
   const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
-
-  const yesterdayDate = moment().subtract(2, 'weeks').toDate();
+  const yesterdayDate = moment().subtract(1, 'day').toDate();
 
   const callbackArgs = campaigns.map(campaign => ({
-    from,
+    from: yesterday,
     to: yesterday,
     campaign,
     createdDate: yesterdayDate,
