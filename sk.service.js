@@ -2,6 +2,8 @@ const axios = require('axios');
 const client = require('./db');
 const moment = require('moment');
 
+client.connect();
+
 const SK = {
   URLS: {
     CAMPAIGN: 'https://api.sourceknowledge.com/affiliate/v2/campaigns',
@@ -49,7 +51,7 @@ exports.skGetStatsByDate = async ({ from, to, campaignId }) => {
     }
   );
 
-  return { campaignId, items };
+  return items;
 };
 
 exports.skCreateStat = ({
@@ -89,13 +91,11 @@ exports.skCreateStat = ({
   return res;
 };
 
-exports.skBulkSaveStat = async ({ stats }) => {
-  await client.connect();
-
+exports.skSaveStat = async ({ stat }) => {
   const db = client.db('dailypull');
   const collection = db.collection('stats_traffic_sources_new');
 
-  await collection.insertMany(stats);
+  await collection.insertOne(stat);
 };
 
 exports._onInterval = async ({ interval, callback, callbackArgs }) => {
@@ -105,13 +105,42 @@ exports._onInterval = async ({ interval, callback, callbackArgs }) => {
   console.log(`Runs to finish: ${callbackArgs.length}`);
 
   for (const args of callbackArgs) {
-    console.log(`Run ${count} :>> ${JSON.stringify(args)}`);
+    console.log(`Run ${count} start ----------------------`);
     const result = await callback(args);
     results.push(result);
     await new Promise((resolve, reject) => setTimeout(resolve, interval));
     count += 1;
+    console.log(`---------------------- Run ${count} end`);
   }
   return results;
+};
+
+exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
+  const {
+    id: campaignId,
+    name: campaignName,
+    advertiser: { id: merchantId, name: merchantName },
+  } = campaign;
+
+  console.log(`Getting stat of ${campaignId}`);
+  const skRawStats = await this.skGetStatsByDate({ from, to, campaignId });
+
+  console.log(`Creating stats of ${campaignId}`);
+
+  for (const item of skRawStats) {
+    const stat = this.skCreateStat({
+      skRawStat: item,
+      accountEmail: SK.CREDENTIALS.EMAIL,
+      createdDate,
+      merchantName,
+      merchantId,
+      campaignId,
+      campaignName,
+    });
+
+    console.log(`Saving stat of ${campaignId}`);
+    await this.skSaveStat({ stat });
+  }
 };
 
 exports.skInit = async () => {
@@ -119,49 +148,24 @@ exports.skInit = async () => {
   console.time('skInit');
 
   const campaigns = await this.skGetCampaigns();
-  const campaignMap = campaigns.reduce((acc, item) => {
-    acc[item.id] = item;
-    return acc;
-  }, {});
 
-  const from = moment().subtract(2, 'weeks').format('YYYY-MM-DD');
+  const from = moment().subtract(1, 'week').format('YYYY-MM-DD');
   const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
-  
+
   const yesterdayDate = moment().subtract(2, 'weeks').toDate();
 
-  const callbackArgs = campaigns.map(item => {
-    return {
-      campaignId: item.id,
-      from: from,
-      to: yesterday,
-    };
+  const callbackArgs = campaigns.map(campaign => ({
+    from,
+    to: yesterday,
+    campaign,
+    createdDate: yesterdayDate,
+  }));
+
+  await this._onInterval({
+    interval: 2000,
+    callback: this.skGetAndSaveStats,
+    callbackArgs,
   });
-
-  const campaignStats = await this._onInterval({
-    interval: 3000,
-    callback: this.skGetStatsByDate,
-    callbackArgs: callbackArgs,
-  });
-
-  const campaignStatsRow = campaignStats.flatMap(campaign => {
-    const { campaignId, items } = campaign;
-
-    return items.map(item => {
-      const matchCampaign = campaignMap[campaignId];
-
-      return this.skCreateStat({
-        skRawStat: item,
-        accountEmail: SK.CREDENTIALS.EMAIL,
-        createdDate: yesterdayDate,
-        merchantId: matchCampaign.advertiser.id,
-        merchantName: matchCampaign.advertiser.name,
-        campaignId: matchCampaign.id,
-        campaignName: matchCampaign.name,
-      });
-    });
-  });
-
-  await this.skBulkSaveStat({ stats: campaignStatsRow });
 
   console.timeEnd('skInit');
 };
