@@ -8,12 +8,15 @@ const cxnUsers = [
     email: 'rubi@aka-extensions.com',
     password: 'sdfLKNl34$jhndJ',
   },
+  {
+    email: 'sean@aka-extensions.com',
+    password: 'fsdfJKHjknbkl235$',
+  },
 ];
 const fetchData = async () => {
   try {
-
-    await skInit();
-    // await cxnInit({ users: cxnUsers });
+    // await skInit();
+    await cxnInit({ users: cxnUsers });
   } catch (error) {
     console.error('Error:', error.message);
   }

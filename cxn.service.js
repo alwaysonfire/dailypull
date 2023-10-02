@@ -87,8 +87,8 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
       publisherId: publisherId.toString(),
       reportType: 'CUSTOM_REPORT',
       timeRangeType: null,
-      startDate: '2023-08-30',
-      endDate: '2023-09-13',
+      startDate: '2023-09-17',
+      endDate: '2023-09-27',
       aggregationType: 'DAY',
       pageNumber: 1,
       preview: false,
@@ -157,6 +157,8 @@ exports.cxnInit = async ({ users }) => {
   console.time('connexity_time');
   await client.connect();
 
+  let totalInserted = 0;
+
   for (const user of users) {
     console.log(`getting data from ${user.email}`);
 
@@ -171,7 +173,11 @@ exports.cxnInit = async ({ users }) => {
     if (cxnData.length > 0) {
       await collection.insertMany(cxnData);
     }
+
+    totalInserted += cxnData.length;
   }
+
+  console.log('total inserted rows :>> ', totalInserted);
 
   console.timeEnd('connexity_time');
 };
