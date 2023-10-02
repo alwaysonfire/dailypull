@@ -125,7 +125,7 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
   console.log(`Getting stat of ${campaignId}`);
   const skRawStats = await this.skGetStatsByDate({ from, to, campaignId });
 
-  console.log(`Creating stats of ${campaignId}`);
+  console.log('Raw Stats :>> ', skRawStats.length);
 
   for (const item of skRawStats) {
     const stat = this.skCreateStat({
@@ -141,6 +141,8 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
     console.log(`Saving stat of ${campaignId}`);
     await this.skSaveStat({ stat });
   }
+
+  return skRawStats.length
 };
 
 exports.skInit = async () => {
@@ -159,11 +161,15 @@ exports.skInit = async () => {
     createdDate: yesterdayDate,
   }));
 
-  await this._onInterval({
+  const allRows = await this._onInterval({
     interval: 2000,
     callback: this.skGetAndSaveStats,
     callbackArgs,
   });
+
+  const totalInsert = allRows.reduce((acc, item) => acc + item, 0);
+
+  console.log('total inserted sk rows :>> ', totalInsert);
 
   console.timeEnd('skInit');
 };

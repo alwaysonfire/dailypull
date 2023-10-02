@@ -157,6 +157,8 @@ exports.cxnInit = async ({ users }) => {
   console.time('connexity_time');
   await client.connect();
 
+  let totalCount = 0;
+
   for (const user of users) {
     console.log(`getting data from ${user.email}`);
 
@@ -171,7 +173,11 @@ exports.cxnInit = async ({ users }) => {
     if (cxnData.length > 0) {
       await collection.insertMany(cxnData);
     }
+
+    totalCount += cxnData.length;
   }
+
+  console.log('total inserted cxn rows :>> ', totalCount);
 
   console.timeEnd('connexity_time');
 };
