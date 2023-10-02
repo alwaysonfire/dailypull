@@ -112,6 +112,7 @@ exports._onInterval = async ({ interval, callback, callbackArgs }) => {
     count += 1;
     console.log(`---------------------- Run ${count} end`);
   }
+
   return results;
 };
 
@@ -125,7 +126,7 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
   console.log(`Getting stat of ${campaignId}`);
   const skRawStats = await this.skGetStatsByDate({ from, to, campaignId });
 
-  console.log(`Creating stats of ${campaignId}`);
+  console.log('Raw stats :>> ', skRawStats.length);
 
   for (const item of skRawStats) {
     const stat = this.skCreateStat({
@@ -141,6 +142,8 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
     console.log(`Saving stat of ${campaignId}`);
     await this.skSaveStat({ stat });
   }
+
+  return skRawStats.length;
 };
 
 exports.skInit = async () => {
@@ -149,23 +152,25 @@ exports.skInit = async () => {
 
   const campaigns = await this.skGetCampaigns();
 
-  const from = moment().subtract(1, 'week').format('YYYY-MM-DD');
-  const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
-
-  const yesterdayDate = moment().subtract(2, 'weeks').toDate();
+  const from = moment(new Date('2023', '8', '17')).format('YYYY-MM-DD');
+  const yesterday = moment(new Date('2023', '8', '24')).format('YYYY-MM-DD');
 
   const callbackArgs = campaigns.map(campaign => ({
     from,
     to: yesterday,
     campaign,
-    createdDate: yesterdayDate,
+    createdDate: new Date('2023', '8', '24'),
   }));
 
-  await this._onInterval({
+  const allRows = await this._onInterval({
     interval: 2000,
     callback: this.skGetAndSaveStats,
     callbackArgs,
   });
+
+  const rowLength = allRows.reduce((acc, item) => acc + item, 0);
+
+  console.log('total inserted rows :>> ', rowLength);
 
   console.timeEnd('skInit');
 };

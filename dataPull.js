@@ -11,8 +11,9 @@ const cxnUsers = [
 ];
 const fetchData = async () => {
   try {
-    // await skInit();
-    await cxnInit({ users: cxnUsers });
+
+    await skInit();
+    // await cxnInit({ users: cxnUsers });
   } catch (error) {
     console.error('Error:', error.message);
   }
