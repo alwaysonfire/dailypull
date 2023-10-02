@@ -153,7 +153,7 @@ exports.skInit = async () => {
   const campaigns = await this.skGetCampaigns();
 
   const ranges = new Array(30).fill(0).map((item, index) => {
-    return new Date('2023', '8', index + 1);
+    return moment(new Date('2023', '8', index + 1)).format('YYYY-MM-DD')
   });
 
   const args = campaigns.flatMap(campaign => {
