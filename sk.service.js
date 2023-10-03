@@ -167,14 +167,14 @@ exports.skInit = async () => {
   //   });
   // });
 
-  const from = moment(new Date('2023', '8', '1')).format('YYYY-MM-DD');
-  const yesterday = moment(new Date('2023', '8', '31')).format('YYYY-MM-DD');
+  const from = moment(new Date('2023', '9', '1')).format('YYYY-MM-DD');
+  const yesterday = moment(new Date('2023', '9', '1')).format('YYYY-MM-DD');
 
   const callbackArgs = campaigns.map(campaign => ({
     from,
     to: yesterday,
     campaign,
-    createdDate: new Date('2023', '8', '31'),
+    createdDate: new Date('2023', '9', '1'),
   }));
 
   const allRows = await this._onInterval({
