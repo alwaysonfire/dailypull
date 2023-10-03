@@ -142,13 +142,14 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
     await this.skSaveStat({ stat });
   }
 
-  return skRawStats.length
+  return skRawStats.length;
 };
 
 exports.skInit = async () => {
   console.log('--skInit start--');
   console.time('skInit');
 
+  const timeStart = new Date();
   const campaigns = await this.skGetCampaigns();
 
   const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
@@ -168,8 +169,15 @@ exports.skInit = async () => {
   });
 
   const totalInsert = allRows.reduce((acc, item) => acc + item, 0);
-
   console.log('total inserted sk rows :>> ', totalInsert);
 
+  const timeEnd = new Date();
+
+  const timeToProcess = (timeEnd - timeStart) / 1000;
   console.timeEnd('skInit');
+
+  return {
+    rows: totalInsert,
+    timeToProcess,
+  };
 };

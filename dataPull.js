@@ -3,6 +3,11 @@ const cron = require('node-cron');
 const { cxnInit } = require('./cxn.service');
 const { skInit } = require('./sk.service');
 
+const { writeFile } = require('fs');
+const util = require('node:util');
+
+const promiseWriteFile = util.promisify(writeFile);
+
 const cxnUsers = [
   {
     email: 'rubi@aka-extensions.com',
@@ -15,8 +20,18 @@ const cxnUsers = [
 ];
 const fetchData = async () => {
   try {
-    await skInit();
-    await cxnInit({ users: cxnUsers });
+    const skResult = await skInit();
+    const cxnResult = await cxnInit({ users: cxnUsers });
+
+    const toWrite =
+      JSON.stringify({
+        skResult,
+        cxnResult,
+        dateNow: new Date().toISOString(),
+      }) + '\n';
+
+    await promiseWriteFile('logs.txt', toWrite, { flag: 'a' });
+
     console.log('--DONE--');
   } catch (error) {
     console.error('Error:', error.message);
