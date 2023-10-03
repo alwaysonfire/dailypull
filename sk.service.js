@@ -152,25 +152,35 @@ exports.skInit = async () => {
 
   const campaigns = await this.skGetCampaigns();
 
-  const ranges = new Array(30).fill(0).map((item, index) => {
-    return moment(new Date('2023', '8', index + 1)).format('YYYY-MM-DD')
-  });
+  // const ranges = new Array(30).fill(0).map((item, index) => {
+  //   return moment(new Date('2023', '8', index + 1)).format('YYYY-MM-DD');
+  // });
 
-  const args = campaigns.flatMap(campaign => {
-    return ranges.map(date => {
-      return {
-        from: date,
-        to: date,
-        campaign,
-        createdDate: date,
-      };
-    });
-  });
+  // const args = campaigns.flatMap(campaign => {
+  //   return ranges.map(date => {
+  //     return {
+  //       from: date,
+  //       to: date,
+  //       campaign,
+  //       createdDate: date,
+  //     };
+  //   });
+  // });
+
+  const from = moment(new Date('2023', '8', '1')).format('YYYY-MM-DD');
+  const yesterday = moment(new Date('2023', '8', '31')).format('YYYY-MM-DD');
+
+  const callbackArgs = campaigns.map(campaign => ({
+    from,
+    to: yesterday,
+    campaign,
+    createdDate: new Date('2023', '8', '31'),
+  }));
 
   const allRows = await this._onInterval({
     interval: 2000,
     callback: this.skGetAndSaveStats,
-    callbackArgs: args
+    callbackArgs,
   });
 
   const rowLength = allRows.reduce((acc, item) => acc + item, 0);
