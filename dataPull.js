@@ -20,14 +20,19 @@ const cxnUsers = [
 ];
 const fetchData = async () => {
   try {
+    const fetchStart = new Date();
     const skResult = await skInit();
     const cxnResult = await cxnInit({ users: cxnUsers });
+    const fetchEnd = new Date();
+    const timeToProcess = (fetchEnd - fetchStart) / 1000
 
     const toWrite =
       JSON.stringify({
         skResult,
         cxnResult,
-        dateNow: new Date().toISOString(),
+        fetchStart,
+        fetchEnd,
+        timeToProcess,
       }) + '\n';
 
     await promiseWriteFile('logs.txt', toWrite, { flag: 'a' });
