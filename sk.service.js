@@ -126,7 +126,7 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
   console.log(`Getting stat of ${campaignId}`);
   const skRawStats = await this.skGetStatsByDate({ from, to, campaignId });
 
-  console.log('Raw stats :>> ', skRawStats.length);
+  console.log('Raw Stats :>> ', skRawStats.length);
 
   for (const item of skRawStats) {
     const stat = this.skCreateStat({
@@ -144,48 +144,51 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
   }
 
   return skRawStats.length;
+
+  return skRawStats.length;
 };
 
 exports.skInit = async () => {
   console.log('--skInit start--');
   console.time('skInit');
 
+  const timeStart = new Date();
   const campaigns = await this.skGetCampaigns();
 
-  // const ranges = new Array(30).fill(0).map((item, index) => {
-  //   return moment(new Date('2023', '8', index + 1)).format('YYYY-MM-DD');
-  // });
-
-  // const args = campaigns.flatMap(campaign => {
-  //   return ranges.map(date => {
-  //     return {
-  //       from: date,
-  //       to: date,
-  //       campaign,
-  //       createdDate: date,
-  //     };
-  //   });
-  // });
-
-  const from = moment(new Date('2023', '9', '1')).format('YYYY-MM-DD');
-  const yesterday = moment(new Date('2023', '9', '1')).format('YYYY-MM-DD');
+  const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
+  const yesterdayDate = moment().subtract(1, 'day').toDate();
 
   const callbackArgs = campaigns.map(campaign => ({
-    from,
+    from: yesterday,
     to: yesterday,
     campaign,
     createdDate: new Date('2023', '9', '1'),
   }));
 
   const allRows = await this._onInterval({
+  const allRows = await this._onInterval({
     interval: 2000,
     callback: this.skGetAndSaveStats,
     callbackArgs,
   });
 
-  const rowLength = allRows.reduce((acc, item) => acc + item, 0);
+  const totalInsert = allRows.reduce((acc, item) => acc + item, 0);
+  console.log('total inserted sk rows :>> ', totalInsert);
 
-  console.log('total inserted rows :>> ', rowLength);
+  const timeEnd = new Date();
 
+  const timeToProcess = (timeEnd - timeStart) / 1000;
   console.timeEnd('skInit');
+
+  return {
+    rows: totalInsert,
+    timeToProcess,
+    args: {
+      statsRequestedDate: {
+        from: yesterday,
+        to: yesterday,
+        createdDate: yesterdayDate.toISOString(),
+      },
+    },
+  };
 };

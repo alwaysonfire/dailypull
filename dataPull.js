@@ -3,6 +3,11 @@ const cron = require('node-cron');
 const { cxnInit } = require('./cxn.service');
 const { skInit } = require('./sk.service');
 
+const { writeFile } = require('fs');
+const util = require('node:util');
+
+const promiseWriteFile = util.promisify(writeFile);
+
 const cxnUsers = [
   {
     email: 'rubi@aka-extensions.com',
@@ -15,8 +20,24 @@ const cxnUsers = [
 ];
 const fetchData = async () => {
   try {
-    // await skInit();
-    await cxnInit({ users: cxnUsers });
+    const fetchStart = new Date();
+    const skResult = await skInit();
+    const cxnResult = await cxnInit({ users: cxnUsers });
+    const fetchEnd = new Date();
+    const timeToProcess = (fetchEnd - fetchStart) / 1000
+
+    const toWrite =
+      JSON.stringify({
+        skResult,
+        cxnResult,
+        fetchStart,
+        fetchEnd,
+        timeToProcess,
+      }) + '\n';
+
+    await promiseWriteFile('logs.txt', toWrite, { flag: 'a' });
+
+    console.log('--DONE--');
   } catch (error) {
     console.error('Error:', error.message);
   }
@@ -24,10 +45,7 @@ const fetchData = async () => {
 
 console.log('Scheduler started.');
 
-console.log('Running data pull...');
-fetchData();
-
-// cron.schedule('0 0 * * *', () => {
-//   console.log('Running data pull...');
-//   fetchData();
-// });
+cron.schedule('0 0 * * *', () => {
+  console.log('Running data pull...');
+  fetchData();
+});

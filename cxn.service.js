@@ -155,9 +155,11 @@ exports.downloadCsvAsJson = async ({ downloadUrl, config = {}, email, accountId 
 exports.cxnInit = async ({ users }) => {
   console.log('Pulling from connexity');
   console.time('connexity_time');
+  const timeStart = new Date();
+
   await client.connect();
 
-  let totalInserted = 0;
+  let totalCount = 0;
 
   for (const user of users) {
     console.log(`getting data from ${user.email}`);
@@ -174,10 +176,19 @@ exports.cxnInit = async ({ users }) => {
       await collection.insertMany(cxnData);
     }
 
-    totalInserted += cxnData.length;
+    totalCount += cxnData.length;
   }
 
-  console.log('total inserted rows :>> ', totalInserted);
+  console.log('total inserted cxn rows :>> ', totalCount);
 
   console.timeEnd('connexity_time');
+  const timeEnd = new Date();
+
+  const timeToProcess = (timeEnd - timeStart) / 1000;
+  console.timeEnd('skInit');
+
+  return {
+    rows: totalCount,
+    timeToProcess,
+  };
 };
