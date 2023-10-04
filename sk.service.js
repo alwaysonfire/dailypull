@@ -179,5 +179,8 @@ exports.skInit = async () => {
   return {
     rows: totalInsert,
     timeToProcess,
+    args: {
+      statsRequestedDate: { from: yesterday, to: yesterday },
+    },
   };
 };
