@@ -180,7 +180,11 @@ exports.skInit = async () => {
     rows: totalInsert,
     timeToProcess,
     args: {
-      statsRequestedDate: { from: yesterday, to: yesterday },
+      statsRequestedDate: {
+        from: yesterday,
+        to: yesterday,
+        createdDate: yesterdayDate.toISOString(),
+      },
     },
   };
 };
