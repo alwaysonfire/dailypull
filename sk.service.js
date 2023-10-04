@@ -144,8 +144,6 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
   }
 
   return skRawStats.length;
-
-  return skRawStats.length;
 };
 
 exports.skInit = async () => {
@@ -155,17 +153,16 @@ exports.skInit = async () => {
   const timeStart = new Date();
   const campaigns = await this.skGetCampaigns();
 
-  const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
-  const yesterdayDate = moment().subtract(1, 'day').toDate();
+  const yesterday = moment(new Date('2023', '9', '2')).format('YYYY-MM-DD');
+  const yesterdayDate = moment(new Date('2023', '9', '2'));
 
   const callbackArgs = campaigns.map(campaign => ({
     from: yesterday,
     to: yesterday,
     campaign,
-    createdDate: new Date('2023', '9', '1'),
+    createdDate: new Date('2023', '9', '2'),
   }));
 
-  const allRows = await this._onInterval({
   const allRows = await this._onInterval({
     interval: 2000,
     callback: this.skGetAndSaveStats,
