@@ -23,14 +23,14 @@ const fetchData = async () => {
   try {
     const fetchStart = new Date();
     const skResult = await skInit();
-    // const cxnResult = await cxnInit({ users: cxnUsers });
+    const cxnResult = await cxnInit({ users: cxnUsers });
     const fetchEnd = new Date();
     const timeToProcess = (fetchEnd - fetchStart) / 1000
 
     const toWrite =
       JSON.stringify({
         skResult,
-        // cxnResult,
+        cxnResult,
         fetchStart,
         fetchEnd,
         timeToProcess,

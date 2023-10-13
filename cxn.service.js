@@ -79,6 +79,8 @@ exports.cxnAuthenticate = async ({ email, password }) => {
   return data;
 };
 
+// to pull 10-09
+
 exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
   console.log('downloading connexity report');
 
@@ -87,8 +89,8 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
       publisherId: publisherId.toString(),
       reportType: 'CUSTOM_REPORT',
       timeRangeType: null,
-      startDate: '2023-10-01',
-      endDate: '2023-10-01',
+      startDate: '2023-10-09',
+      endDate: '2023-10-09',
       aggregationType: 'DAY',
       pageNumber: 1,
       preview: false,
