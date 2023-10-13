@@ -46,8 +46,7 @@ const fetchData = async () => {
 
 console.log('Scheduler started.');
 
-fetchData();
-
-// cron.schedule('0 0 * * *', () => {
-//   console.log('Running data pull...');
-// });
+cron.schedule('0 1 * * *', () => {
+  console.log('Running data pull...');
+  fetchData();
+});
