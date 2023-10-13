@@ -79,8 +79,6 @@ exports.cxnAuthenticate = async ({ email, password }) => {
   return data;
 };
 
-// to pull 10-09
-
 exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
   console.log('downloading connexity report');
 
