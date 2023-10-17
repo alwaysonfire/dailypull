@@ -25,7 +25,7 @@ const fetchData = async () => {
     const skResult = await skInit();
     // const cxnResult = await cxnInit({ users: cxnUsers });
     const fetchEnd = new Date();
-    const timeToProcess = (fetchEnd - fetchStart) / 1000
+    const timeToProcess = (fetchEnd - fetchStart) / 1000;
 
     const toWrite =
       JSON.stringify({
@@ -46,7 +46,8 @@ const fetchData = async () => {
 
 console.log('Scheduler started.');
 
-cron.schedule('0 1 * * *', () => {
-  console.log('Running data pull...');
-  fetchData();
-});
+fetchData();
+
+// cron.schedule('0 1 * * *', () => {
+//   console.log('Running data pull...');
+// });
