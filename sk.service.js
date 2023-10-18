@@ -153,14 +153,14 @@ exports.skInit = async () => {
   const timeStart = new Date();
   const campaigns = await this.skGetCampaigns();
 
-  const yesterday = moment(new Date('2023', '9', '8')).format('YYYY-MM-DD');
-  const yesterdayDate = moment(new Date('2023', '9', '8'));
+  const yesterday = moment(new Date('2023', '9', '9')).format('YYYY-MM-DD');
+  const yesterdayDate = moment(new Date('2023', '9', '9'));
 
   const callbackArgs = campaigns.map(campaign => ({
     from: yesterday,
     to: yesterday,
     campaign,
-    createdDate: new Date('2023', '9', '8'),
+    createdDate: new Date('2023', '9', '9'),
   }));
 
   const allRows = await this._onInterval({
