@@ -182,9 +182,9 @@ exports.skInit = async ({ date }) => {
     timeToProcess,
     args: {
       statsRequestedDate: {
-        from: yesterday,
-        to: yesterday,
-        createdDate: yesterdayDate.toISOString(),
+        from: date,
+        to: date,
+        createdDate: date,
       },
     },
   };
