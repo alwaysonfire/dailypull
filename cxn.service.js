@@ -79,16 +79,16 @@ exports.cxnAuthenticate = async ({ email, password }) => {
   return data;
 };
 
-exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
-  console.log('downloading connexity report');
+exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5, date }, done) => {
+  console.log('downloading connexity report. date: ', date);
 
   return new Promise(async (resolve, reject) => {
     const requestData = {
       publisherId: publisherId.toString(),
       reportType: 'CUSTOM_REPORT',
       timeRangeType: null,
-      startDate: '2023-10-05',
-      endDate: '2023-10-05',
+      startDate: date,
+      endDate: date,
       aggregationType: 'DAY',
       pageNumber: 1,
       preview: false,
@@ -117,7 +117,7 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
       console.log(`retrying to download connexity report. retries left: ${retry - 1}`);
 
       setTimeout(
-        () => this.cxnGetReportDownloadUrl({ token, publisherId, retry: retry - 1 }, resolveFn),
+        () => this.cxnGetReportDownloadUrl({ token, publisherId, retry: retry - 1, date }, resolveFn),
         10000
       );
     } else {
@@ -126,10 +126,10 @@ exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
   });
 };
 
-exports.cxnGetReportJsonData = async ({ email, password, accountId }) => {
+exports.cxnGetReportJsonData = async ({ email, password, accountId, date }) => {
   const { token, publisherId } = await this.cxnAuthenticate({ email, password });
 
-  const data = await this.cxnGetReportDownloadUrl({ token, publisherId });
+  const data = await this.cxnGetReportDownloadUrl({ token, publisherId, date });
 
   if (!data) throw new Error('no report generated from connexity');
 
@@ -152,7 +152,7 @@ exports.downloadCsvAsJson = async ({ downloadUrl, config = {}, email, accountId 
   return cleanedJson;
 };
 
-exports.cxnInit = async ({ users }) => {
+exports.cxnInit = async ({ users, date }) => {
   console.log('Pulling from connexity');
   console.time('connexity_time');
   const timeStart = new Date();
@@ -164,7 +164,7 @@ exports.cxnInit = async ({ users }) => {
   for (const user of users) {
     console.log(`getting data from ${user.email}`);
 
-    const cxnData = await this.cxnGetReportJsonData(user);
+    const cxnData = await this.cxnGetReportJsonData({ ...user, date });
 
     console.log(`data from ${user.email} :>> `, cxnData.length);
 
