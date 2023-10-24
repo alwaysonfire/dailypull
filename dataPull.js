@@ -24,19 +24,19 @@ const fetchData = async () => {
     const fetchStart = new Date();
     const pullDate = process.argv[2] ?? '';
 
-    // const skResult = await skInit({ date: pullDate });
-    const cxnResult = await cxnInit({ users: cxnUsers, date: pullDate });
+    const skResult = await skInit({ date: pullDate });
+    // const cxnResult = await cxnInit({ users: cxnUsers, date: pullDate });
     const fetchEnd = new Date();
     const timeToProcess = (fetchEnd - fetchStart) / 1000;
 
     const toWrite =
       JSON.stringify({
-        // skResult,
-        cxnResult,
+        skResult,
+        // cxnResult,
         fetchStart,
         fetchEnd,
         timeToProcess,
-        note: `cxn only ${pullDate}`,
+        note: `SK only ${pullDate}`,
       }) + '\n';
 
     await promiseWriteFile('logs.txt', toWrite, { flag: 'a' });
