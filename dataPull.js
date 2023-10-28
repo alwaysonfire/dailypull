@@ -49,7 +49,7 @@ const fetchData = async () => {
 
 console.log('Scheduler started.');
 
-// fetchData();
+fetchData();
 
 // const test = async () => {
 //   const camp = await skGetCampaigns();

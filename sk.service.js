@@ -172,6 +172,8 @@ exports.skInit = async ({ date }) => {
   const timeStart = new Date();
   const campaigns = await this.skGetCampaigns();
 
+  console.log('campaigns.length :>> ', campaigns.length);
+
   const callbackArgs = campaigns.map(campaign => ({
     from: date,
     to: date,
@@ -197,6 +199,7 @@ exports.skInit = async ({ date }) => {
     rows: totalInsert,
     timeToProcess,
     args: {
+      campaigns: campaigns.length,
       statsRequestedDate: {
         from: date,
         to: date,
