@@ -2,6 +2,11 @@ const axios = require('axios');
 const client = require('./db');
 const moment = require('moment');
 
+const { writeFile } = require('fs');
+const util = require('node:util');
+
+const promiseWriteFile = util.promisify(writeFile);
+
 client.connect();
 
 const SK = {
@@ -16,20 +21,34 @@ const SK = {
   },
 };
 
-exports.skGetCampaigns = async () => {
-  const {
-    data: { items },
-  } = await axios.get(SK.URLS.CAMPAIGN, {
-    headers: {
-      Authorization: SK.AUTH.BASIC,
-    },
-    params: {
-      page: null,
-      advertiserId: null,
-    },
-  });
+exports.skGetCampaigns = (page = 2, campaigns = [], doneFn = null) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { data } = await axios.get(SK.URLS.CAMPAIGN, {
+        headers: {
+          Authorization: SK.AUTH.BASIC,
+        },
+        params: {
+          page,
+          advertiserId: null,
+        },
+      });
 
-  return items;
+      campaigns = campaigns.concat(data.items);
+
+      const resolveFn = doneFn ?? resolve;
+
+      if (data.hasMore) {
+        return setTimeout(() => {
+          this.skGetCampaigns(page + 1, campaigns, resolveFn);
+        }, 3000);
+      }
+
+      resolveFn(campaigns);
+    } catch (error) {
+      reject({ page, hasDoneFn: !!doneFn, campaignLength: campaigns.length, error });
+    }
+  });
 };
 
 exports.skGetStatsByDate = async ({ from, to, campaignId }) => {
@@ -152,9 +171,6 @@ exports.skInit = async ({ date }) => {
 
   const timeStart = new Date();
   const campaigns = await this.skGetCampaigns();
-
-  // const yesterday = moment(new Date('2023', '9', '13')).format('YYYY-MM-DD');
-  // const yesterdayDate = moment(new Date('2023', '9', '13'));
 
   const callbackArgs = campaigns.map(campaign => ({
     from: date,

@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 
 const { cxnInit } = require('./cxn.service');
-const { skInit } = require('./sk.service');
+const { skInit, skInitExport, skGetCampaigns } = require('./sk.service');
 
 const { writeFile } = require('fs');
 const util = require('node:util');
@@ -49,7 +49,18 @@ const fetchData = async () => {
 
 console.log('Scheduler started.');
 
-fetchData();
+// fetchData();
+
+// const test = async () => {
+//   const camp = await skGetCampaigns();
+
+//   console.log('camp.length :>> ', camp.length);
+  // const pullDate = process.argv[2] ?? '';
+
+  // await skInitExport({ date: pullDate });
+// };
+
+// test();
 
 // cron.schedule('0 1 * * *', () => {
 //   console.log('Running data pull...');
