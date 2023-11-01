@@ -21,7 +21,7 @@ const SK = {
   },
 };
 
-exports.skGetCampaigns = (page = 2, campaigns = [], doneFn = null) => {
+exports.skGetCampaigns = (page = 1, campaigns = [], doneFn = null) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { data } = await axios.get(SK.URLS.CAMPAIGN, {
