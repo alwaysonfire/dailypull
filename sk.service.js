@@ -2,6 +2,11 @@ const axios = require('axios');
 const client = require('./db');
 const moment = require('moment');
 
+const { writeFile } = require('fs');
+const util = require('node:util');
+
+const promiseWriteFile = util.promisify(writeFile);
+
 client.connect();
 
 const SK = {
@@ -16,20 +21,34 @@ const SK = {
   },
 };
 
-exports.skGetCampaigns = async () => {
-  const {
-    data: { items },
-  } = await axios.get(SK.URLS.CAMPAIGN, {
-    headers: {
-      Authorization: SK.AUTH.BASIC,
-    },
-    params: {
-      page: null,
-      advertiserId: null,
-    },
-  });
+exports.skGetCampaigns = (page = 1, campaigns = [], doneFn = null) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { data } = await axios.get(SK.URLS.CAMPAIGN, {
+        headers: {
+          Authorization: SK.AUTH.BASIC,
+        },
+        params: {
+          page,
+          advertiserId: null,
+        },
+      });
 
-  return items;
+      campaigns = campaigns.concat(data.items);
+
+      const resolveFn = doneFn ?? resolve;
+
+      if (data.hasMore) {
+        return setTimeout(() => {
+          this.skGetCampaigns(page + 1, campaigns, resolveFn);
+        }, 3000);
+      }
+
+      resolveFn(campaigns);
+    } catch (error) {
+      reject({ page, hasDoneFn: !!doneFn, campaignLength: campaigns.length, error });
+    }
+  });
 };
 
 exports.skGetStatsByDate = async ({ from, to, campaignId }) => {
@@ -112,6 +131,7 @@ exports._onInterval = async ({ interval, callback, callbackArgs }) => {
     count += 1;
     console.log(`---------------------- Run ${count} end`);
   }
+
   return results;
 };
 
@@ -146,20 +166,22 @@ exports.skGetAndSaveStats = async ({ from, to, campaign, createdDate }) => {
 };
 
 exports.skInit = async () => {
-  console.log('--skInit start--');
+  console.log(`--skInit start--`);
   console.time('skInit');
 
   const timeStart = new Date();
   const campaigns = await this.skGetCampaigns();
 
-  const yesterday = moment().subtract(2, 'days').format('YYYY-MM-DD');
-  const yesterdayDate = moment().subtract(2, 'days').toDate();
+  console.log('campaigns.length :>> ', campaigns.length);
+
+  const daysAgo = moment().subtract(2, 'days').format('YYYY-MM-DD');
+  const daysAgoDate = moment().subtract(2, 'days').toDate();
 
   const callbackArgs = campaigns.map(campaign => ({
-    from: yesterday,
-    to: yesterday,
+    from: daysAgo,
+    to: daysAgo,
     campaign,
-    createdDate: yesterdayDate,
+    createdDate: daysAgoDate,
   }));
 
   const allRows = await this._onInterval({
@@ -180,10 +202,11 @@ exports.skInit = async () => {
     rows: totalInsert,
     timeToProcess,
     args: {
+      campaigns: campaigns.length,
       statsRequestedDate: {
-        from: yesterday,
-        to: yesterday,
-        createdDate: yesterdayDate.toISOString(),
+        from: daysAgo,
+        to: daysAgo,
+        createdDate: daysAgoDate.toISOString(),
       },
     },
   };
