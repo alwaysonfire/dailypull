@@ -8,6 +8,8 @@ const util = require('node:util');
 
 const promiseWriteFile = util.promisify(writeFile);
 
+const logger = require('./util/logger');
+
 const cxnUsers = [
   {
     email: 'rubi@aka-extensions.com',
@@ -36,7 +38,7 @@ const fetchData = async () => {
       }) + '\n';
 
     await promiseWriteFile('logs.txt', toWrite, { flag: 'a' });
-
+    logger.success('Fetching of data successful', toWrite);
     console.log('--DONE--');
   } catch (error) {
     console.error('Error:', error.message);
