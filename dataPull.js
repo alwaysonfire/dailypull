@@ -37,10 +37,10 @@ const fetchData = async () => {
         timeToProcess,
       }) + '\n';
 
-    await promiseWriteFile('logs.txt', toWrite, { flag: 'a' });
     logger.success('Fetching of data successful', toWrite);
     console.log('--DONE--');
   } catch (error) {
+    logger.error(`Fetching of data failed: ${error.message}`);
     console.error('Error:', error.message);
   }
 };
