@@ -41,7 +41,7 @@ const cloudWatchOptions = {
     JSON.stringify({
       logLevel: level,
       message: message,
-      parameters: metadata,
+      dataPullResults: metadata,
     }),
 };
 
