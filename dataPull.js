@@ -21,8 +21,8 @@ const cxnUsers = [
 const fetchData = async () => {
   try {
     const fetchStart = new Date();
-    const skResult = await skInit();
     const cxnResult = await cxnInit({ users: cxnUsers });
+    const skResult = await skInit();
     const fetchEnd = new Date();
     const timeToProcess = (fetchEnd - fetchStart) / 1000;
 
@@ -45,7 +45,7 @@ const fetchData = async () => {
 
 console.log('Scheduler started.');
 
-cron.schedule('0 16 * * *', () => {
+cron.schedule('30 15 * * *', () => {
   console.log('Running data pull...');
   fetchData();
 });
