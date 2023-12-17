@@ -174,8 +174,8 @@ exports.skInit = async () => {
 
   console.log('campaigns.length :>> ', campaigns.length);
 
-  const daysAgo = moment().subtract(2, 'days').format('YYYY-MM-DD');
-  const daysAgoDate = moment().subtract(2, 'days').toDate();
+  const daysAgo = moment().subtract(1, 'day').format('YYYY-MM-DD');
+  const daysAgoDate = moment().subtract(1, 'day').toDate();
 
   const callbackArgs = campaigns.map(campaign => ({
     from: daysAgo,

@@ -82,13 +82,15 @@ exports.cxnAuthenticate = async ({ email, password }) => {
 exports.cxnGetReportDownloadUrl = ({ token, publisherId, retry = 5 }, done) => {
   console.log('downloading connexity report');
 
+  const yesterday = moment().subtract(1, 'day').format('YYYY-MM-DD');
+  
   return new Promise(async (resolve, reject) => {
     const requestData = {
       publisherId: publisherId.toString(),
       reportType: 'CUSTOM_REPORT',
-      timeRangeType: 'YESTERDAY',
-      startDate: null,
-      endDate: null,
+      timeRangeType: null,
+      startDate: yesterday,
+      endDate: yesterday,
       aggregationType: 'DAY',
       pageNumber: 1,
       preview: false,
